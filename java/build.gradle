@@ -1,0 +1,17 @@
+plugins {
+    id "java"
+}
+
+sourceCompatibility = 1.5
+archivesBaseName = "PrintJavaVersion"
+
+jar.manifest {
+    attributes("Main-Class": "PrintJavaVersion")
+}
+
+task copyOut(type: Copy) {
+    from jar.archivePath
+    into '.'
+}
+
+build.dependsOn copyOut

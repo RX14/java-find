@@ -1,0 +1,32 @@
+{
+  "name": "java-find",
+  "version": "0.0.1",
+  "description": "Find and list java installations with metadata",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "prepublish": "tsd install && tsc && cd java && ./gradlew clean build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/RX14/node-java-find/"
+  },
+  "keywords": [
+    "typescript",
+    "java",
+    "node",
+    "windows"
+  ],
+  "author": "RX14",
+  "license": "MIT",
+  "dependencies": {
+    "async": "^1.5.2",
+    "bluebird": "^3.1.5",
+    "underscore": "^1.8.3",
+    "winreg": "0.0.16"
+  },
+  "devDependencies": {
+    "tsd": "^0.6.5",
+    "typescript": "^1.8.0"
+  }
+}
