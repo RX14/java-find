@@ -64,7 +64,7 @@ export class JavaInstall {
                 execFile(this._path, ["-jar", __dirname + "/java/PrintJavaVersion.jar"], {timeout: 1000}, (err, stdoutBuf, stderrBuf) => {
                     if (err) {
                         this._invalid = true
-                        reject(err)
+                        resolve()
                         return
                     }
 
@@ -87,6 +87,7 @@ export class JavaInstall {
                     const version = lines[0]
                     this._version = new JavaVersion(version)
 
+                    this._gotInfo = true
                     resolve()
                 })
             })
@@ -129,6 +130,9 @@ export const getJavas = utils.PromiseCache((): Promise<Array<JavaInstall>> => {
 
         .then(versions => unique(versions, v => v.path))
 
+        .each<JavaInstall, void>(version => version.ensureInfo())
+        .filter<JavaInstall>(version => !version.invalid)
+        .tap(v => {debug(`Versions Final: ${inspect(v)}`)})
 })
 
 //region Linux
