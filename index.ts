@@ -8,6 +8,7 @@ import {each as asyncEach} from "async"
 import {join, basename} from "path"
 import {unique} from "underscore"
 import {execFile} from "child_process"
+import {inspect} from "util"
 
 export class JavaVersion {
     major: number
@@ -96,8 +97,14 @@ export class JavaInstall {
 }
 
 const defaultJava = new JavaInstall("java")
+let debug = (debug: string) => {}
+
+export function setDebug(debugFn: (debug: string) => void) {
+    debug = debugFn
+}
 
 export const getJavas = utils.PromiseCache((): Promise<Array<JavaInstall>> => {
+    debug(`getJavas start (${process.platform})`)
     let javas: Promise<Array<JavaInstall>>
     switch (process.platform) {
         case "win32":
@@ -115,7 +122,11 @@ export const getJavas = utils.PromiseCache((): Promise<Array<JavaInstall>> => {
     }
 
     return javas
+        .tap(v => {debug(`Versions Raw: ${inspect(v)}`)})
+
         .filter<JavaInstall>(version => utils.canExecute(version.path))
+        .tap(v => {debug(`Versions Existing: ${inspect(v)}`)})
+
         .then(versions => unique(versions, v => v.path))
 
 })
@@ -213,6 +224,7 @@ function findJavasFromRegistryKey(keyName: string, arch: string): Promise<Array<
                     cb()
                 })
             }, (err) => {
+                debug(`Reg key ${keyName} arch ${arch}, got ${javaVersions}`)
                 if (err) reject(err)
                 else resolve(javaVersions)
             })
