@@ -187,8 +187,8 @@ const defaultJavasWindows = [
     new JavaInstall("C:/Program Files/Java/jre7/bin/javaw.exe"),
     new JavaInstall("C:/Program Files/Java/jre6/bin/javaw.exe"),
     new JavaInstall("C:/Program Files (x86)/Java/jre8/bin/javaw.exe"),
-    new JavaInstall("C:/Program Files (x76)/Java/jre7/bin/javaw.exe"),
-    new JavaInstall("C:/Program Files (x66)/Java/jre6/bin/javaw.exe"),
+    new JavaInstall("C:/Program Files (x86)/Java/jre7/bin/javaw.exe"),
+    new JavaInstall("C:/Program Files (x86)/Java/jre6/bin/javaw.exe"),
     defaultJava
 ]
 
