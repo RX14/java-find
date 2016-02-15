@@ -1,6 +1,3 @@
-///<reference path="typings/tsd.d.ts"/>
-"use strict"
-
 import * as Promise from "bluebird"
 import * as utils from "./utils"
 import * as WinReg from "winreg"

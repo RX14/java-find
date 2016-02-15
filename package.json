@@ -28,5 +28,6 @@
   "devDependencies": {
     "tsd": "^0.6.5",
     "typescript": "^1.8.0"
-  }
+  },
+  "typings": "index.d.ts"
 }

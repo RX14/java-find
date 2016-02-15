@@ -6,11 +6,9 @@
     "declaration": true,
     "stripInternal": true
   },
-  "exclude": [
-    "node_modules",
-    "pkg",
-    "src",
-    "ui",
-    "typings"
+  "files": [
+    "typings/tsd.d.ts",
+    "utils.ts",
+    "index.ts"
   ]
 }
