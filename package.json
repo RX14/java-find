@@ -23,6 +23,7 @@
     "async": "^1.5.2",
     "bluebird": "^3.1.5",
     "underscore": "^1.8.3",
+    "which": "^1.2.4",
     "winreg": "0.0.16"
   },
   "devDependencies": {

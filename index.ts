@@ -1,6 +1,7 @@
 import * as Promise from "bluebird"
 import * as utils from "./utils"
 import * as WinReg from "winreg"
+import * as which from "which"
 import {each as asyncEach} from "async"
 import {join, basename} from "path"
 import {unique} from "underscore"
@@ -101,7 +102,6 @@ export class JavaInstall {
     }
 }
 
-const defaultJava = new JavaInstall("java")
 let debug = (debug: string) => {}
 
 export function setDebug(debugFn: (debug: string) => void) {
@@ -122,7 +122,7 @@ export const getJavas = utils.PromiseCache((): Promise<Array<JavaInstall>> => {
             javas = findJavasLinux()
             break
         default:
-            javas = Promise.resolve([defaultJava])
+            javas = findJavaOnPath()
             break
     }
 
@@ -141,19 +141,17 @@ export const getJavas = utils.PromiseCache((): Promise<Array<JavaInstall>> => {
 
 //region Linux
 const defaultJavasLinux = [
-    defaultJava,
     new JavaInstall("/opt/java/bin/java"),
     new JavaInstall("/usr/bin/java")
 ]
 
 function findJavasLinux(): Promise<Array<JavaInstall>> {
-    return Promise.resolve(defaultJavasLinux)
+    return Promise.all([defaultJavasLinux, findJavaOnPath()]).then(utils.flatten)
 }
 //endregion
 
 //region Mac
 const defaultJavasMac = [
-    defaultJava,
     new JavaInstall("/Applications/Xcode.app/Contents/Applications/Application Loader.app/Contents/MacOS/itms/java/bin/java"),
     new JavaInstall("/Library/Internet Plug-Ins/JavaAppletPlugin.plugin/Contents/Home/bin/java"),
     new JavaInstall("/System/Library/Frameworks/JavaVM.framework/Versions/Current/Commands/java")
@@ -161,6 +159,7 @@ const defaultJavasMac = [
 
 function findJavasMac(): Promise<Array<JavaInstall>> {
     let javaVersionPromises: Array<Promise<Array<JavaInstall>>> = []
+    javaVersionPromises.push(findJavaOnPath())
     javaVersionPromises.push(Promise.resolve(defaultJavasMac))
 
     javaVersionPromises.push(
@@ -195,13 +194,13 @@ const defaultJavasWindows = [
     new JavaInstall("C:/Program Files/Java/jre6/bin/javaw.exe"),
     new JavaInstall("C:/Program Files (x86)/Java/jre8/bin/javaw.exe"),
     new JavaInstall("C:/Program Files (x86)/Java/jre7/bin/javaw.exe"),
-    new JavaInstall("C:/Program Files (x86)/Java/jre6/bin/javaw.exe"),
-    defaultJava
+    new JavaInstall("C:/Program Files (x86)/Java/jre6/bin/javaw.exe")
 ]
 
 function findJavasWindows(): Promise<Array<JavaInstall>> {
     let javaVersionPromises: Array<Promise<Array<JavaInstall>>> = []
     javaVersionPromises.push(Promise.resolve(defaultJavasWindows))
+    javaVersionPromises.push(findJavaOnPath())
 
     javaRegKeys.forEach(key => {
         javaVersionPromises.push(findJavasFromRegistryKey(key, "x64"))
@@ -240,3 +239,9 @@ function findJavasFromRegistryKey(keyName: string, arch: string): Promise<Array<
     })
 }
 //endregion
+
+const whichP = Promise.promisify(which)
+function findJavaOnPath(): Promise<Array<JavaInstall>> {
+    return whichP("java")
+        .then(path => [new JavaInstall(path)], err => [])
+}
