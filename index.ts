@@ -163,7 +163,7 @@ function findJavasMac(): Promise<Array<JavaInstall>> {
     javaVersionPromises.push(Promise.resolve(defaultJavasMac))
 
     javaVersionPromises.push(
-        utils.allDirectories("/Library/Java/JavaVirtualMachines/")
+        utils.allDirectories("/Library/Java/JavaVirtualMachines/").catch(err => [])
             .map(dir => [
                 new JavaInstall(join(dir, "Contents/Home/bin/java")),
                 new JavaInstall(join(dir, "Contents/Home/jre/bin/java"))
@@ -171,7 +171,7 @@ function findJavasMac(): Promise<Array<JavaInstall>> {
     )
 
     javaVersionPromises.push(
-        utils.allDirectories("/System/Library/Java/JavaVirtualMachines/")
+        utils.allDirectories("/System/Library/Java/JavaVirtualMachines/").catch(err => [])
             .map(dir => [
                 new JavaInstall(join(dir, "Contents/Home/bin/java")),
                 new JavaInstall(join(dir, "Contents/Commands/java"))
@@ -203,8 +203,8 @@ function findJavasWindows(): Promise<Array<JavaInstall>> {
     javaVersionPromises.push(findJavaOnPath())
 
     javaRegKeys.forEach(key => {
-        javaVersionPromises.push(findJavasFromRegistryKey(key, "x64"))
-        javaVersionPromises.push(findJavasFromRegistryKey(key, "x86"))
+        javaVersionPromises.push(findJavasFromRegistryKey(key, "x64").catch(err => []))
+        javaVersionPromises.push(findJavasFromRegistryKey(key, "x86").catch(err => []))
     })
 
     return Promise.all(javaVersionPromises).then(utils.flatten)
