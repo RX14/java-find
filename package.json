@@ -1,6 +1,6 @@
 {
   "name": "java-find",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "Find and list java installations with metadata",
   "main": "index.js",
   "scripts": {
