@@ -58,14 +58,19 @@ export class JavaInstall {
     ensureInfo(): Promise<void> {
         if (!this._gotInfo && !this._invalid) {
             return new Promise<void>((resolve, reject) => {
-                execFile(this._path, ["-jar", __dirname + "/java/PrintJavaVersion.jar"], {timeout: 1000}, (err, stdoutBuf, stderrBuf) => {
+                var jarFile = __dirname + "/java/PrintJavaVersion.jar"
+                debug(`jarFile: ${jarFile}`)
+                execFile(this._path, ["-jar", jarFile], {timeout: 1000}, (err, stdoutBuf, stderrBuf) => {
                     if (err) {
+                        debug(`[${this._path}] Err: ${err}`)
+
                         this._invalid = true
                         resolve()
                         return
                     }
 
                     const stdout = stdoutBuf.toString().trim()
+                    debug(`[${this._path}] stdout: ${inspect(stdout)}`)
                     const lines = stdout.split("\n")
 
                     const arch = lines[1]
@@ -83,6 +88,8 @@ export class JavaInstall {
 
                     const version = lines[0]
                     this._version = new JavaVersion(version)
+
+                    debug(`[${this._path}] ${inspect(this)}`)
 
                     this._gotInfo = true
                     resolve()
@@ -120,10 +127,10 @@ export const getJavas = utils.PromiseCache((): Promise<Array<JavaInstall>> => {
     }
 
     return javas
-        .tap(v => {debug(`Versions Raw: ${inspect(v)}`)})
+        .tap(v => {debug(`Versions Raw: ${inspect(v.map(v => v.path))}`)})
 
         .filter<JavaInstall>(version => utils.canExecute(version.path))
-        .tap(v => {debug(`Versions Existing: ${inspect(v)}`)})
+        .tap(v => {debug(`Versions Existing: ${inspect(v.map(v => v.path))}`)})
 
         .then(versions => unique(versions, v => v.path))
 
